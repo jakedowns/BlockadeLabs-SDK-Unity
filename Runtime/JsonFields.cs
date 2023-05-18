@@ -1,7 +1,23 @@
-﻿namespace BlockadeLabsSDK
+﻿using Codice.Client.Commands;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace BlockadeLabsSDK
 {
     [System.Serializable]
     public class CreateSkyboxResult
+    {
+        public string id { get; set; }
+        public string obfuscated_id { get; set; }
+    }
+
+    [System.Serializable]
+    public class CreateImagineResult
+    {
+        public CreateImagineRequest request { get; set; }
+    }
+
+    public class CreateImagineRequest
     {
         public string id { get; set; }
         public string obfuscated_id { get; set; }
@@ -12,7 +28,7 @@
     {
         public GetImagineRequest request { get; set; }
     }
-    
+
     public class GetImagineRequest
     {
         public string file_url { get; set; }
@@ -21,12 +37,62 @@
     }
 
     [System.Serializable]
+    public class Generator
+    {
+        public int id { get; set; }
+        public string generator { get; set; }
+        public Dictionary<string, Param> @params { get; set; }
+    }
+
+    [System.Serializable]
+    public class ParamOption
+    {
+        public string label { get; set; }
+        public string value { get; set; }
+    }
+
+    [System.Serializable]
+    public class Param
+    {
+        public string name { get; set; }
+        public string type { get; set; }
+        public string default_value { get; set; }
+        public bool required { get; set; }
+        public ParamOption[] options {get; set; }
+    }
+
+    public class GeneratorField
+    {
+        public string key;
+
+        public string name;
+
+        public string value;
+
+        // for select-type params
+        public int selectedIndex = 0;
+
+        public bool required;
+
+        public Param param;
+
+        // Constructor to initialize field with data from API response
+        public GeneratorField(KeyValuePair<string, Param> fieldData)
+        {
+            key = fieldData.Key; // "prompt"
+            name = fieldData.Value.name; // "Imagine text prompt"
+            value = fieldData.Value.default_value ?? "";
+            required = fieldData.Value.required;
+            param = fieldData.Value;
+        }
+    }
+
     public class SkyboxStyle
     {
         public int id;
         public string name;
     }
-    
+
     public class UserInput
     {
         public string key;
@@ -37,14 +103,13 @@
         // Constructor to initialize user input with data from API response
         public UserInput(string key, int id, string name, string placeholder)
         {
-            this.key = key; 
-            this.id = id; 
+            this.key = key;
+            this.id = id;
             this.name = name;
             this.placeholder = placeholder;
         }
     }
-    
-    [System.Serializable]
+
     public class SkyboxStyleField
     {
         public string key;
@@ -54,9 +119,9 @@
         // Constructor to initialize skybox style field with data from API response
         public SkyboxStyleField(UserInput fieldData)
         {
-            key = fieldData.key; // "prompt"
-            name = fieldData.name; // "Prompt"
-            value = fieldData.placeholder ?? "";
+            key = fieldData.key; // [USER_INPUT_1]
+            name = fieldData.name; // "prompt"
+            value = "";
         }
     }
 }
